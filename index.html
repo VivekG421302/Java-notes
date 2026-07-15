@@ -538,9 +538,50 @@ When adding a new feature, add a new "// ===== NAME =====" or "/* SECTION: NAME 
         .readability-controls { position: fixed; bottom: 20px; bottom: max(20px, env(safe-area-inset-bottom)); right: 20px; right: max(20px, env(safe-area-inset-right)); z-index: 500; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; pointer-events: none; }
         .readability-toggle { width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--glass-border); background: var(--glass-bg); backdrop-filter: blur(10px); color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); font-size: 1.2rem; box-shadow: var(--shadow); pointer-events: auto; }
         .readability-toggle:hover { color: var(--accent-blue); border-color: var(--accent-blue); transform: scale(1.1); }
-        .readability-panel { background: var(--glass-bg); backdrop-filter: blur(20px); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 12px; box-shadow: var(--shadow-lg); min-width: 200px; opacity: 0; visibility: hidden; transform: translateY(10px) scale(0.95); transition: all 0.25s ease; margin-bottom: 8px; color: var(--text-primary); pointer-events: none; }
-        .readability-panel.show { opacity: 1; visibility: visible; transform: translateY(0) scale(1); pointer-events: auto; }
-        .readability-panel h4 { margin: 0 0 12px 0; font-size: 0.85rem; color: var(--text-primary); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        /* Legacy panel hidden — replaced by modal */
+        .readability-panel { display: none !important; }
+
+        /* SECTION: SETTINGS MODAL */
+        .settings-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px); z-index: 900; display: flex; align-items: center; justify-content: center; padding: 16px; padding-top: max(16px, env(safe-area-inset-top)); padding-bottom: max(16px, env(safe-area-inset-bottom)); opacity: 0; visibility: hidden; transition: opacity 0.25s ease, visibility 0.25s ease; }
+        .settings-modal-overlay.open { opacity: 1; visibility: visible; }
+        .settings-modal { background: var(--bg-secondary); border: 1px solid var(--glass-border); border-radius: 16px; width: 100%; max-width: 480px; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 24px 64px rgba(0,0,0,0.5); transform: translateY(20px) scale(0.97); transition: transform 0.25s ease; overflow: hidden; }
+        .settings-modal-overlay.open .settings-modal { transform: translateY(0) scale(1); }
+        .settings-modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 16px; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        .settings-modal-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); letter-spacing: 0.3px; display: flex; align-items: center; gap: 10px; }
+        .settings-modal-title svg { color: var(--accent-blue); }
+        .settings-modal-close { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border-color); background: var(--bg-tertiary); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition); font-size: 1.1rem; line-height: 1; }
+        .settings-modal-close:hover { color: var(--text-primary); border-color: var(--text-secondary); background: var(--bg-hover); }
+        .settings-modal-body { overflow-y: auto; flex: 1; padding: 12px 16px 20px; -webkit-overflow-scrolling: touch; }
+        .settings-modal-body::-webkit-scrollbar { width: 4px; }
+        .settings-modal-body::-webkit-scrollbar-track { background: transparent; }
+        .settings-modal-body::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+        /* Accordion sections inside modal */
+        .sm-section { border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 8px; overflow: hidden; }
+        .sm-section-header { display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; cursor: pointer; background: var(--bg-tertiary); transition: background 0.18s; user-select: none; gap: 10px; }
+        .sm-section-header:hover { background: var(--bg-hover); }
+        .sm-section-title { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+        .sm-section-title svg { color: var(--accent-blue); flex-shrink: 0; }
+        .sm-section-chevron { color: var(--text-muted); transition: transform 0.22s ease; flex-shrink: 0; }
+        .sm-section.open .sm-section-chevron { transform: rotate(180deg); }
+        .sm-section-body { display: none; padding: 16px; background: var(--bg-primary); border-top: 1px solid var(--border-color); }
+        .sm-section.open .sm-section-body { display: block; }
+
+        /* Inner controls reuse existing slider-group / toggle-row classes */
+        .sm-section-body .slider-group { margin-bottom: 14px; }
+        .sm-section-body .slider-group:last-child { margin-bottom: 0; }
+        .sm-section-body .toggle-row { margin-bottom: 10px; }
+        .sm-section-body .toggle-row:last-child { margin-bottom: 0; }
+
+        /* Reset footer */
+        .settings-modal-footer { padding: 12px 16px; border-top: 1px solid var(--border-color); flex-shrink: 0; }
+        .sm-reset-btn { width: 100%; padding: 10px; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-secondary); font-size: 0.82rem; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 7px; font-weight: 600; font-family: inherit; }
+        .sm-reset-btn:hover { color: var(--accent-red, #f85149); border-color: var(--accent-red, #f85149); background: var(--bg-hover); }
+
+        @media (max-width: 480px) {
+            .settings-modal { max-width: 100%; max-height: 92vh; border-radius: 16px 16px 0 0; margin-top: auto; }
+            .settings-modal-overlay { align-items: flex-end; padding: 0; }
+        }
         .slider-group { margin-bottom: 12px; }
         .slider-group label { display: block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500; }
         .slider-group input[type="range"] { width: 100%; -webkit-appearance: none; height: 6px; border-radius: 3px; background: var(--bg-tertiary); outline: none; border: 1px solid var(--border-color); }
@@ -11644,76 +11685,131 @@ spring.flyway.locations: classpath:db/migration
     </div>
 
     <!-- Readability Controls -->
+    <!-- Settings FAB -->
     <div class="readability-controls" id="readabilityControls">
-        <div class="readability-panel" id="readabilityPanel">
-            <h4 style="margin:0 0 8px;font-size:0.78rem;letter-spacing:1px;">Display Settings</h4>
-            <div class="slider-group" style="margin-bottom:8px;">
-                <label style="font-size:0.75rem;">Glass Opacity <span id="glassOpacityValue">65%</span></label>
-                <input type="range" id="glassOpacitySlider" min="0" max="100" value="65" oninput="updateGlassOpacity(this.value)">
-            </div>
-            <div class="slider-group" style="margin-bottom:8px;">
-                <label style="font-size:0.75rem;">Content Width</label>
-                <input type="range" id="contentWidthSlider" min="60" max="100" value="100" oninput="updateContentWidth(this.value)">
-            </div>
-            <div class="toggle-row" style="margin-bottom:4px;">
-                <label style="font-size:0.75rem;">Blobs</label>
-                <div class="toggle-switch active" id="blobToggle" onclick="toggleBlobs()"></div>
-            </div>
-            <div class="blob-advanced-controls" id="blobAdvancedControls" style="gap:8px;padding:6px 0 0 10px;">
-                <div class="slider-group" style="margin-bottom:6px;">
-                    <label style="font-size:0.75rem;">Speed <span id="blobSpeedValue">Medium</span></label>
-                    <input type="range" id="blobSpeedSlider" min="0" max="2" step="1" value="1" oninput="updateBlobSpeed(this.value)">
+        <button class="readability-toggle" onclick="toggleReadabilityPanel()" title="Display settings" aria-label="Open settings">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="settings-modal-overlay" id="settingsModalOverlay" onclick="closeSettingsModal(event)" role="dialog" aria-modal="true" aria-label="Settings">
+        <div class="settings-modal">
+            <div class="settings-modal-header">
+                <div class="settings-modal-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    Display Settings
                 </div>
-                <div class="slider-group" style="margin-bottom:6px;">
-                    <label style="font-size:0.75rem;">Blur <span id="blobBlurValue">80px</span></label>
-                    <input type="range" id="blobBlurSlider" min="20" max="100" step="5" value="80" oninput="updateBlobBlur(this.value)">
-                </div>
-                <div class="slider-group" style="margin-bottom:2px;">
-                    <label style="font-size:0.75rem;">Color</label>
-                    <div class="blob-scheme-row" id="blobSchemeRow" style="flex-wrap:wrap;gap:5px;margin-top:4px;">
-                        <button class="blob-scheme-swatch active" data-scheme="aurora" onclick="setBlobScheme('aurora')" title="Aurora Indigo" style="background:linear-gradient(135deg,#58a6ff,#d2a8ff);" aria-label="Aurora"></button>
-                        <button class="blob-scheme-swatch" data-scheme="cyberpunk" onclick="setBlobScheme('cyberpunk')" title="Cyberpunk Neon" style="background:linear-gradient(135deg,#ff2e93,#00f0ff);" aria-label="Cyberpunk"></button>
-                        <button class="blob-scheme-swatch" data-scheme="monochrome" onclick="setBlobScheme('monochrome')" title="Deep Space Mono" style="background:linear-gradient(135deg,#cbd5e1,#334155);" aria-label="Mono"></button>
-                        <button class="blob-scheme-swatch" data-scheme="sunset" onclick="setBlobScheme('sunset')" title="Sunset Coral" style="background:linear-gradient(135deg,#ff6b35,#f7931e);" aria-label="Sunset"></button>
-                        <button class="blob-scheme-swatch" data-scheme="forest" onclick="setBlobScheme('forest')" title="Emerald Forest" style="background:linear-gradient(135deg,#00c853,#1de9b6);" aria-label="Forest"></button>
-                        <button class="blob-scheme-swatch" data-scheme="lava" onclick="setBlobScheme('lava')" title="Lava Volcano" style="background:linear-gradient(135deg,#ff1744,#ff6d00);" aria-label="Lava"></button>
-                        <button class="blob-scheme-swatch" data-scheme="ocean" onclick="setBlobScheme('ocean')" title="Deep Ocean" style="background:linear-gradient(135deg,#006994,#00b4d8);" aria-label="Ocean"></button>
-                        <button class="blob-scheme-swatch" data-scheme="galaxy" onclick="setBlobScheme('galaxy')" title="Galaxy Purple" style="background:linear-gradient(135deg,#7b2ff7,#f107a3);" aria-label="Galaxy"></button>
+                <button class="settings-modal-close" onclick="toggleReadabilityPanel()" aria-label="Close settings">&times;</button>
+            </div>
+
+            <div class="settings-modal-body" id="readabilityPanel">
+
+                <!-- Appearance -->
+                <div class="sm-section open" id="sm-appearance">
+                    <div class="sm-section-header" onclick="toggleSmSection('sm-appearance')" role="button" aria-expanded="true">
+                        <div class="sm-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                            Appearance
+                        </div>
+                        <svg class="sm-section-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <div class="sm-section-body">
+                        <div class="slider-group">
+                            <label>Glass Opacity <span id="glassOpacityValue">65%</span></label>
+                            <input type="range" id="glassOpacitySlider" min="0" max="100" value="65" oninput="updateGlassOpacity(this.value)">
+                        </div>
+                        <div class="slider-group">
+                            <label>Content Width</label>
+                            <input type="range" id="contentWidthSlider" min="60" max="100" value="100" oninput="updateContentWidth(this.value)">
+                        </div>
+                        <div class="toggle-row">
+                            <label>Glass Effect</label>
+                            <div class="toggle-switch active" id="glassToggle" onclick="toggleGlassEffect()"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="toggle-row" style="margin-top:6px;margin-bottom:4px;">
-                <label style="font-size:0.75rem;">Glass Effect</label>
-                <div class="toggle-switch active" id="glassToggle" onclick="toggleGlassEffect()"></div>
-            </div>
-            <div class="dictate-voice-section">
-                <h4>Voice &amp; Dictation</h4>
-                <select class="dictate-select" id="dictateVoiceSelect" onchange="updateDictateVoice(this.value)">
-                    <option value="">Loading voices...</option>
-                </select>
-                <div class="slider-group" style="margin-bottom:8px;">
-                    <label style="font-size:0.75rem;">Speed <span id="dictateSpeedValue">1x</span></label>
-                    <input type="range" id="dictateSpeedSlider" min="0.5" max="2" step="0.1" value="1" oninput="updateDictateSpeed(this.value)">
+
+                <!-- Background Blobs -->
+                <div class="sm-section" id="sm-blobs">
+                    <div class="sm-section-header" onclick="toggleSmSection('sm-blobs')" role="button" aria-expanded="false">
+                        <div class="sm-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg>
+                            Background Blobs
+                        </div>
+                        <svg class="sm-section-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <div class="sm-section-body">
+                        <div class="toggle-row">
+                            <label>Show Blobs</label>
+                            <div class="toggle-switch active" id="blobToggle" onclick="toggleBlobs()"></div>
+                        </div>
+                        <div class="blob-advanced-controls" id="blobAdvancedControls">
+                            <div class="slider-group">
+                                <label>Speed <span id="blobSpeedValue">Medium</span></label>
+                                <input type="range" id="blobSpeedSlider" min="0" max="2" step="1" value="1" oninput="updateBlobSpeed(this.value)">
+                            </div>
+                            <div class="slider-group">
+                                <label>Blur <span id="blobBlurValue">80px</span></label>
+                                <input type="range" id="blobBlurSlider" min="20" max="100" step="5" value="80" oninput="updateBlobBlur(this.value)">
+                            </div>
+                            <div class="slider-group">
+                                <label>Color Scheme</label>
+                                <div class="blob-scheme-row" id="blobSchemeRow" style="flex-wrap:wrap;gap:6px;margin-top:6px;">
+                                    <button class="blob-scheme-swatch active" data-scheme="aurora" onclick="setBlobScheme('aurora')" title="Aurora Indigo" style="background:linear-gradient(135deg,#58a6ff,#d2a8ff);" aria-label="Aurora"></button>
+                                    <button class="blob-scheme-swatch" data-scheme="cyberpunk" onclick="setBlobScheme('cyberpunk')" title="Cyberpunk Neon" style="background:linear-gradient(135deg,#ff2e93,#00f0ff);" aria-label="Cyberpunk"></button>
+                                    <button class="blob-scheme-swatch" data-scheme="monochrome" onclick="setBlobScheme('monochrome')" title="Deep Space Mono" style="background:linear-gradient(135deg,#cbd5e1,#334155);" aria-label="Mono"></button>
+                                    <button class="blob-scheme-swatch" data-scheme="sunset" onclick="setBlobScheme('sunset')" title="Sunset Coral" style="background:linear-gradient(135deg,#ff6b35,#f7931e);" aria-label="Sunset"></button>
+                                    <button class="blob-scheme-swatch" data-scheme="forest" onclick="setBlobScheme('forest')" title="Emerald Forest" style="background:linear-gradient(135deg,#00c853,#1de9b6);" aria-label="Forest"></button>
+                                    <button class="blob-scheme-swatch" data-scheme="lava" onclick="setBlobScheme('lava')" title="Lava Volcano" style="background:linear-gradient(135deg,#ff1744,#ff6d00);" aria-label="Lava"></button>
+                                    <button class="blob-scheme-swatch" data-scheme="ocean" onclick="setBlobScheme('ocean')" title="Deep Ocean" style="background:linear-gradient(135deg,#006994,#00b4d8);" aria-label="Ocean"></button>
+                                    <button class="blob-scheme-swatch" data-scheme="galaxy" onclick="setBlobScheme('galaxy')" title="Galaxy Purple" style="background:linear-gradient(135deg,#7b2ff7,#f107a3);" aria-label="Galaxy"></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="slider-group" style="margin-bottom:8px;">
-                    <label style="font-size:0.75rem;">Pitch <span id="dictatePitchValue">1</span></label>
-                    <input type="range" id="dictatePitchSlider" min="0.5" max="1.5" step="0.1" value="1" oninput="updateDictatePitch(this.value)">
+
+                <!-- Voice & Dictation -->
+                <div class="sm-section" id="sm-dictation">
+                    <div class="sm-section-header" onclick="toggleSmSection('sm-dictation')" role="button" aria-expanded="false">
+                        <div class="sm-section-title">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                            Voice &amp; Dictation
+                        </div>
+                        <svg class="sm-section-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                    <div class="sm-section-body">
+                        <div class="slider-group">
+                            <label>Voice</label>
+                            <select class="dictate-select" id="dictateVoiceSelect" onchange="updateDictateVoice(this.value)" style="margin-top:4px;">
+                                <option value="">Loading voices...</option>
+                            </select>
+                        </div>
+                        <div class="slider-group">
+                            <label>Speed <span id="dictateSpeedValue">1x</span></label>
+                            <input type="range" id="dictateSpeedSlider" min="0.5" max="2" step="0.1" value="1" oninput="updateDictateSpeed(this.value)">
+                        </div>
+                        <div class="slider-group">
+                            <label>Pitch <span id="dictatePitchValue">1</span></label>
+                            <input type="range" id="dictatePitchSlider" min="0.5" max="1.5" step="0.1" value="1" oninput="updateDictatePitch(this.value)">
+                        </div>
+                        <button class="dictate-stop-all" id="dictateStopAllBtn" onclick="stopAllDictation()">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+                            Stop All Dictation
+                        </button>
+                    </div>
                 </div>
-                <button class="dictate-stop-all" id="dictateStopAllBtn" onclick="stopAllDictation()">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
-                    Stop Listening
-                </button>
-            </div>
-            <div style="border-top:1px solid var(--border-color);margin-top:8px;padding-top:8px;">
-                <button onclick="resetAllSettings()" style="width:100%;padding:7px;background:var(--bg-tertiary);border:1px solid var(--glass-border);border-radius:var(--radius-sm);color:var(--text-secondary);font-size:0.78rem;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:6px;font-weight:600;">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-                    Reset
+
+            </div><!-- /settings-modal-body -->
+
+            <div class="settings-modal-footer">
+                <button class="sm-reset-btn" onclick="resetAllSettings()">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+                    Reset All Settings
                 </button>
             </div>
         </div>
-        <button class="readability-toggle" onclick="toggleReadabilityPanel()" title="Display settings">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </button>
     </div>
 
     <!-- Diagram Popup Modal -->
@@ -11789,8 +11885,35 @@ spring.flyway.locations: classpath:db/migration
 
         // ===== READABILITY CONTROLS =====
         function toggleReadabilityPanel() {
-            document.getElementById('readabilityPanel').classList.toggle('show');
+            const overlay = document.getElementById('settingsModalOverlay');
+            const isOpen = overlay.classList.contains('open');
+            if (isOpen) {
+                overlay.classList.remove('open');
+                document.body.style.overflow = '';
+            } else {
+                overlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
         }
+        function closeSettingsModal(e) {
+            if (e.target === document.getElementById('settingsModalOverlay')) {
+                toggleReadabilityPanel();
+            }
+        }
+        function toggleSmSection(id) {
+            const sec = document.getElementById(id);
+            const isOpen = sec.classList.contains('open');
+            sec.classList.toggle('open', !isOpen);
+            const header = sec.querySelector('.sm-section-header');
+            if (header) header.setAttribute('aria-expanded', String(!isOpen));
+        }
+        // Close settings modal on Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const overlay = document.getElementById('settingsModalOverlay');
+                if (overlay && overlay.classList.contains('open')) toggleReadabilityPanel();
+            }
+        });
         function updateGlassOpacity(value) {
             const opacity = value / 100;
             document.documentElement.style.setProperty('--glass-opacity', opacity);
